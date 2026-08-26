@@ -1,0 +1,7 @@
+{
+  "issues": [
+    {"key": "DEMO-1", "fields": {"summary": "First"}},
+    {"key": "DEMO-2", "fields": {"summary": "Second"}}
+  ],
+  "nextPageToken": "page-2-token"
+}

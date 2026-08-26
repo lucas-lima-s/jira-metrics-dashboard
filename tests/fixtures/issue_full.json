@@ -1,0 +1,36 @@
+{
+  "key": "DEMO-1",
+  "fields": {
+    "status": {"name": "Done"},
+    "statuscategorychangedate": "2026-02-10T15:00:00.000-03:00",
+    "assignee": {"displayName": "ana.souza"},
+    "parent": {"key": "DEMO-100"},
+    "issuetype": {"name": "Story"},
+    "created": "2026-02-01T09:00:00.000-03:00",
+    "summary": "Implement the thing",
+    "labels": ["tier-s", "backend"],
+    "fixVersions": [{"name": "A"}, {"name": "B"}],
+    "priority": {"id": "2", "name": "High"},
+    "customfield_99001": "5",
+    "customfield_99002": [
+      {"id": 12, "name": "Sprint 12"},
+      {"id": 34, "name": "Sprint 34"}
+    ]
+  },
+  "changelog": {
+    "histories": [
+      {
+        "created": "2026-02-02T10:00:00.000-03:00",
+        "items": [{"fieldId": "status", "toString": "In Progress"}]
+      },
+      {
+        "created": "2026-02-05T10:00:00.000-03:00",
+        "items": [{"fieldId": "status", "toString": "In Progress"}]
+      },
+      {
+        "created": "2026-02-10T15:00:00.000-03:00",
+        "items": [{"fieldId": "status", "toString": "Done"}]
+      }
+    ]
+  }
+}
