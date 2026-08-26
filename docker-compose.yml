@@ -1,0 +1,97 @@
+name: jira-metrics-dashboard
+
+services:
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DATABASE_USER:-postgres}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-postgres}
+      POSTGRES_DB: ${DATABASE_NAME:-metrics}
+    ports:
+      - "5432:5432"
+    volumes:
+      - jira-metrics-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  migrate:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    environment:
+      DATABASE_URI: ${DATABASE_URI:-postgresql+psycopg}
+      DATABASE_HOST: postgres
+      DATABASE_PORT: ${DATABASE_PORT:-5432}
+      DATABASE_USER: ${DATABASE_USER:-postgres}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-postgres}
+      DATABASE_NAME: ${DATABASE_NAME:-metrics}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: ["jira-metrics", "migrate"]
+    restart: "no"
+
+  seed:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    environment:
+      DATABASE_URI: ${DATABASE_URI:-postgresql+psycopg}
+      DATABASE_HOST: postgres
+      DATABASE_PORT: ${DATABASE_PORT:-5432}
+      DATABASE_USER: ${DATABASE_USER:-postgres}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-postgres}
+      DATABASE_NAME: ${DATABASE_NAME:-metrics}
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    command: ["jira-metrics", "seed", "--reset"]
+    restart: "no"
+
+  grafana:
+    image: grafana/grafana:12.0-ubuntu
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      DATABASE_HOST: postgres
+      DATABASE_PORT: ${DATABASE_PORT:-5432}
+      DATABASE_USER: ${DATABASE_USER:-postgres}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-postgres}
+      DATABASE_NAME: ${DATABASE_NAME:-metrics}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    volumes:
+      - jira-metrics-grafana-data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:3000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  collector:
+    profiles: ["live"]
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    restart: always
+    env_file:
+      - .env
+    environment:
+      DATABASE_HOST: postgres
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    command: ["jira-metrics", "collect"]
+
+volumes:
+  jira-metrics-postgres-data:
+  jira-metrics-grafana-data:

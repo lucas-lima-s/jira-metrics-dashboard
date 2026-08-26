@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: astral-sh/setup-uv@v10.0.1
+        with:
+          enable-cache: true
+      - run: uv sync --locked --all-groups
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - uses: astral-sh/setup-uv@v10.0.1
+        with:
+          enable-cache: true
+      - run: uv sync --locked --all-groups
+      - run: uv run pytest --cov=jira_metrics --cov-report=term-missing --cov-fail-under=85
+
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - run: bash scripts/scan_forbidden.sh
+
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7.0.1
+      - run: cp .env.example .env
+      - run: docker compose up -d --build --wait postgres grafana
+      - run: docker compose run --rm migrate
+      - run: docker compose run --rm seed --reset
+      - name: Verify seeded row count
+        run: |
+          ROWS=$(docker compose exec -T postgres psql -U postgres -d metrics -tAc "select count(*) from jira_issues")
+          test "$ROWS" -ge 200
+      - name: Verify datasource provisioning
+        run: curl -sf -u admin:admin http://localhost:3000/api/datasources/uid/jira-metrics-postgres | jq -e '.type=="postgres"'
+      - name: Verify dashboard provisioning
+        run: curl -sf -u admin:admin http://localhost:3000/api/dashboards/uid/jira-delivery-metrics | jq -e '.dashboard.title=="Jira Delivery Metrics"'
+      - if: always()
+        run: docker compose down -v

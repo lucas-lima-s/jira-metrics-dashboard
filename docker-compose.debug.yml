@@ -1,0 +1,7 @@
+services:
+  collector:
+    ports:
+      - "5678:5678"
+    environment:
+      DEBUGPY_ENABLE: "true"
+      DEBUGPY_WAIT: "true"
