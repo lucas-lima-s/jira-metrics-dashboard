@@ -6,12 +6,12 @@ datasources:
     type: postgres
     access: proxy
     isDefault: true
-    url: ${DATABASE_HOST:-postgres}:${DATABASE_PORT:-5432}
-    user: ${DATABASE_USER:-postgres}
-    database: ${DATABASE_NAME:-metrics}
+    url: ${DATABASE_HOST}:${DATABASE_PORT}
+    user: ${DATABASE_USER}
+    database: ${DATABASE_NAME}
     version: 16
     secureJsonData:
-      password: ${DATABASE_PASSWORD:-postgres}
+      password: ${DATABASE_PASSWORD}
     jsonData:
       sslmode: disable
       maxOpenConns: 50

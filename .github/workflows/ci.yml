@@ -47,7 +47,7 @@ jobs:
           ROWS=$(docker compose exec -T postgres psql -U postgres -d metrics -tAc "select count(*) from jira_issues")
           test "$ROWS" -ge 200
       - name: Verify datasource provisioning
-        run: curl -sf -u admin:admin http://localhost:3000/api/datasources/uid/jira-metrics-postgres | jq -e '.type=="postgres"'
+        run: curl -sf -u admin:admin http://localhost:3000/api/datasources/uid/jira-metrics-postgres | jq -e '.type=="grafana-postgresql-datasource"'
       - name: Verify dashboard provisioning
         run: curl -sf -u admin:admin http://localhost:3000/api/dashboards/uid/jira-delivery-metrics | jq -e '.dashboard.title=="Jira Delivery Metrics"'
       - if: always()

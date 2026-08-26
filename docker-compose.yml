@@ -49,7 +49,8 @@ services:
     depends_on:
       migrate:
         condition: service_completed_successfully
-    command: ["jira-metrics", "seed", "--reset"]
+    entrypoint: ["/entrypoint.sh", "jira-metrics", "seed"]
+    command: ["--reset"]
     restart: "no"
 
   grafana:
@@ -72,7 +73,7 @@ services:
       - jira-metrics-grafana-data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://localhost:3000/api/health"]
+      test: ["CMD-SHELL", "curl -sf http://localhost:3000/api/health"]
       interval: 10s
       timeout: 5s
       retries: 10
