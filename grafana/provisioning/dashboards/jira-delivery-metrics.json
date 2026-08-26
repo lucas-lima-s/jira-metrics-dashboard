@@ -1,0 +1,2012 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": 1,
+  "links": [],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 5,
+      "panels": [],
+      "title": "SPRINT PROGRESS (${CURRENT_SPRINT})",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "jira-metrics-postgres"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-GrYlRd"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 7,
+        "x": 0,
+        "y": 1
+      },
+      "id": 2,
+      "options": {
+        "displayMode": "basic",
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "maxVizHeight": 300,
+        "minVizHeight": 16,
+        "minVizWidth": 8,
+        "namePlacement": "left",
+        "orientation": "vertical",
+        "reduceOptions": {
+          "calcs": [],
+          "fields": "",
+          "values": true
+        },
+        "showUnfilled": false,
+        "sizing": "auto",
+        "valueMode": "text"
+      },
+      "pluginVersion": "12.0.8",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "jira-metrics-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT \r\n    SUM(story_points) AS \"BUGS\"\r\nFROM public.jira_issues\r\nWHERE sprint_name = '$CURRENT_SPRINT'\r\n  AND resolved IS NULL\r\n  AND issue_type LIKE '%Bug%'",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "jira-metrics-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SELECT \r\n    SUM(story_points) AS \"POINTS\",\r\n    COALESCE(split_part(split_part(assignee, ' ', 1), '.',1), 'UNASSIGNED') AS \"DEV\"\r\nFROM public.jira_issues\r\nWHERE sprint_name = '$CURRENT_SPRINT'\r\n  AND resolved IS NULL\r\n  AND issue_type LIKE '%Bug%'\r\nGROUP BY assignee;",
+          "refId": "B",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "${CURRENT_SPRINT} — BUG POINTS",
+      "type": "bargauge"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "jira-metrics-postgres"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-GrYlRd"
+          },
+          "fieldMinMax": false,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 7,
+        "x": 7,
+        "y": 1
+      },
+      "id": 3,
+      "options": {
+        "displayMode": "lcd",
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": false
+        },
+        "maxVizHeight": 300,
+        "minVizHeight": 16,
+        "minVizWidth": 8,
+        "namePlacement": "left",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [],
+          "fields": "",
+          "values": true
+        },
+        "showUnfilled": false,
+        "sizing": "auto",
+        "valueMode": "text"
+      },
+      "pluginVersion": "12.0.8",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "jira-metrics-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SELECT \r\n    SUM(CASE WHEN issue_type ILIKE '%Bug%' THEN 0 ELSE story_points END) AS \"STORIES\"\r\n  FROM public.jira_issues\r\n  WHERE sprint_name = '$CURRENT_SPRINT'\r\n    AND resolved IS NULL\r\n    AND issue_type NOT LIKE '%Bug%'",
+          "refId": "B",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        },
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "jira-metrics-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT \r\n    SUM(story_points) AS \"POINTS\",\r\n    COALESCE(split_part(split_part(assignee, ' ', 1), '.',1), 'UNASSIGNED') AS \"DEV\"\r\nFROM public.jira_issues\r\nWHERE sprint_name = '$CURRENT_SPRINT'\r\n  AND resolved IS NULL\r\n  AND issue_type NOT LIKE '%Bug%'\r\nGROUP BY assignee;",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "${CURRENT_SPRINT} — STORY POINTS",
+      "type": "bargauge"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "jira-metrics-postgres"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 10,
+        "x": 14,
+        "y": 1
+      },
+      "id": 8,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": true
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.0.8",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "jira-metrics-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH base AS (\r\n  SELECT \r\n    status,\r\n    SUM(CASE WHEN issue_type ILIKE '%Bug%' THEN story_points ELSE 0 END) AS \"BUGS\",\r\n    SUM(CASE WHEN issue_type ILIKE '%Bug%' THEN 0 ELSE story_points END) AS \"STORIES\",\r\n    SUM(story_points) AS \"TOTAL\"\r\n  FROM public.jira_issues\r\n  WHERE sprint_name = '$CURRENT_SPRINT'\r\n  GROUP BY status\r\n)\r\nSELECT * FROM BASE",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "${CURRENT_SPRINT} — BREAKDOWN BY STATUS",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "jira-metrics-postgres"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "left",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": true,
+            "inspect": true
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "SUMMARY"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 641
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "POINTS"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 136
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "STARTED"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 158
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "RESOLVED"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 164
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ISSUE"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 114
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "TYPE"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 129
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "STATUS"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 158
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "PRIORITY"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 164
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "DEV"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 157
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 10
+      },
+      "id": 1,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "enablePagination": false,
+          "fields": [
+            "POINTS"
+          ],
+          "reducer": [
+            "sum"
+          ],
+          "show": true
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": false,
+            "displayName": "PRIORITY"
+          }
+        ]
+      },
+      "pluginVersion": "12.0.8",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "jira-metrics-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT  \r\n    issue_key AS \"ISSUE\", \r\n    summary AS \"SUMMARY\", \r\n    issue_type AS \"TYPE\",\r\n    COALESCE(priority_id || ' - ' || priority_name, 'UNASSIGNED') AS \"PRIORITY\",\r\n    status AS \"STATUS\", \r\n    story_points AS \"POINTS\",\r\n    COALESCE(split_part(split_part(assignee, ' ', 1), '.',1), 'UNASSIGNED') AS \"DEV\",\r\n\t\tTO_CHAR(started, 'DD/MM/YYYY HH24:MI') AS \"STARTED\", \r\n    TO_CHAR(resolved, 'DD/MM/YYYY HH24:MI') AS \"RESOLVED\"\r\nFROM public.jira_issues \r\nWHERE sprint_name = '$CURRENT_SPRINT'\r\nORDER BY COALESCE(priority_id || ' - ' || priority_name, 'UNASSIGNED')",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "SPRINT ISSUES — ${CURRENT_SPRINT}",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "jira-metrics-postgres"
+      },
+      "description": "Issues in a team sprint without the team label, OR issues carrying the team label outside the team's sprints.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "left",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": true,
+            "inspect": true
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "SUMMARY"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 641
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "POINTS"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 136
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "STARTED"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 158
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "RESOLVED"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 164
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ISSUE"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 114
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "TYPE"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 129
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "STATUS"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 158
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "PRIORITY"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 164
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "DEV"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 157
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 20
+      },
+      "id": 16,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "enablePagination": false,
+          "fields": [
+            "POINTS"
+          ],
+          "reducer": [
+            "sum"
+          ],
+          "show": true
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": false,
+            "displayName": "PRIORITY"
+          }
+        ]
+      },
+      "pluginVersion": "12.0.8",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "jira-metrics-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT  \r\n    issue_key AS \"ISSUE\", \r\n    summary AS \"SUMMARY\", \r\n    issue_type AS \"TYPE\",\r\n    COALESCE(priority_id || ' - ' || priority_name, 'UNASSIGNED') AS \"PRIORITY\",\r\n    status AS \"STATUS\", \r\n    story_points AS \"POINTS\",\r\n    COALESCE(split_part(split_part(assignee, ' ', 1), '.',1), 'UNASSIGNED') AS \"DEV\",\r\n\t\tTO_CHAR(started, 'DD/MM/YYYY HH24:MI') AS \"STARTED\", \r\n    TO_CHAR(resolved, 'DD/MM/YYYY HH24:MI') AS \"RESOLVED\"\r\nFROM public.jira_issues \r\nWHERE (sprint_name LIKE '$SPRINT_PREFIX%' AND has_team_label IS NOT TRUE)\r\n   OR (has_team_label IS TRUE AND sprint_name NOT LIKE '$SPRINT_PREFIX%')\r\nORDER BY COALESCE(priority_id || ' - ' || priority_name, 'UNASSIGNED')",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "MISMATCHED SPRINT / TEAM LABEL",
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 30
+      },
+      "id": 13,
+      "panels": [],
+      "title": "RELEASE PROGRESS (${CURRENT_RELEASE})",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "jira-metrics-postgres"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "fieldMinMax": true,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "AVG BUG POINTS"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "AVG STORY POINTS"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "RELEASE TOTAL POINTS"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green"
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "DELTA"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 20,
+        "x": 0,
+        "y": 31
+      },
+      "id": 10,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "vertical",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.0.8",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "jira-metrics-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH base AS (\r\n    SELECT  \r\n      sprint_name,\r\n      issue_type, \r\n      status, \r\n      story_points,\r\n      release,\r\n      resolved,\r\n      COALESCE(split_part(split_part(assignee, ' ', 1), '.',1), 'UNASSIGNED') as assignee\r\n   FROM jira_issues \r\n  WHERE story_points > 0\r\n    AND COALESCE(assignee, 'UNASSIGNED') IN ($SELECTED_DEVS)\r\n ),\r\naverage_by_sprint AS (\r\n    SELECT\r\n        sprint_name,\r\n        SUM(CASE WHEN issue_type ILIKE '%Bug%' THEN story_points ELSE 0 END) AS points_of_bug,\r\n        SUM(CASE WHEN issue_type ILIKE '%Bug%' THEN 0 ELSE story_points END) AS points_of_history\r\n    FROM base\r\n   WHERE sprint_name IN ($ALL_SPRINTS)\r\n     AND resolved IS NOT NULL\r\n   GROUP BY sprint_name\r\n),\r\naverage AS (\r\n    SELECT\r\n        FLOOR(AVG(points_of_bug)) AS average_bugs,\r\n        FLOOR(AVG(points_of_history)) AS average_history,\r\n        (SELECT SUM(story_points) FROM base WHERE release LIKE '%$CURRENT_RELEASE%' AND resolved IS NULL) AS release_pending_points,\r\n        COALESCE((SELECT SUM(story_points) FROM base WHERE release LIKE '%$CURRENT_RELEASE%' AND resolved IS NULL AND status NOT IN ('TO DO')), 0) AS release_in_process_points,\r\n        COALESCE((SELECT SUM(story_points) FROM base WHERE release LIKE '%$CURRENT_RELEASE%' AND resolved IS NULL AND status IN ('TO DO')), 0) AS release_to_do_points,\r\n        (SELECT SUM(story_points) FROM base WHERE release LIKE '%$CURRENT_RELEASE%') AS release_points\r\n  FROM average_by_sprint\r\n)\r\nSELECT\r\n  average_bugs AS \"AVG BUG POINTS\",\r\n  average_history AS \"AVG STORY POINTS\",\r\n  release_points AS \"RELEASE TOTAL POINTS\",\r\n  (average_history * $NUMBER_OF_SPRINTS) AS \"TEAM CAPACITY (POINTS)\",\r\n  ((average_history * $NUMBER_OF_SPRINTS) - release_points) as \"DELTA\",\r\n  release_to_do_points AS \"POINTS IN TO DO\",\r\n  release_in_process_points AS \"POINTS IN PROGRESS\",\r\n  release_pending_points AS \"REMAINING RELEASE POINTS\",\r\n  CASE WHEN release_pending_points / NULLIF(average_history, 0) >= 1 \r\n       THEN ROUND(release_pending_points / NULLIF(average_history, 0), 0) \r\n       ELSE FLOOR(release_pending_points / NULLIF(average_history, 0)) \r\n       END AS \"SPRINTS TO FINISH REMAINING\",\r\n       ROUND(release_points / NULLIF(average_history, 0), 1) AS \"SPRINTS TO FINISH RELEASE\"\r\nFROM average;",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "RELEASE FORECAST",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "jira-metrics-postgres"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "left",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": true,
+            "inspect": true
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "SUMMARY"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 686
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "POINTS"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 136
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "STARTED"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 185
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "RESOLVED"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 115
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ISSUE"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 114
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "TYPE"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 129
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "STATUS"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 158
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "coalesce"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 125
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "DEV"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 164
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "PRIORITY"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 160
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 38
+      },
+      "id": 15,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "enablePagination": false,
+          "fields": [
+            "POINTS"
+          ],
+          "reducer": [
+            "sum"
+          ],
+          "show": true
+        },
+        "showHeader": true,
+        "sortBy": []
+      },
+      "pluginVersion": "12.0.8",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "jira-metrics-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT  \r\n    issue_key AS \"ISSUE\", \r\n    summary AS \"SUMMARY\", \r\n    issue_type AS \"TYPE\", \r\n    status AS \"STATUS\", \r\n    story_points AS \"POINTS\",\r\n    COALESCE(priority_id || ' - ' || priority_name, 'UNASSIGNED') AS \"PRIORITY\",\r\n    COALESCE(split_part(split_part(assignee, ' ', 1), '.',1), 'UNASSIGNED') AS \"DEV\",\r\n\t\tTO_CHAR(started, 'DD/MM/YYYY HH24:MI') AS \"STARTED\", \r\n    TO_CHAR(resolved, 'DD/MM/YYYY HH24:MI') AS \"RESOLVED\"\r\nFROM public.jira_issues \r\nWHERE release LIKE '%$CURRENT_RELEASE%'\r\n  AND story_points > 0\r\n  AND COALESCE(assignee, 'UNASSIGNED') IN ($SELECTED_DEVS)\r\nORDER BY COALESCE(priority_id || ' - ' || priority_name, 'UNASSIGNED')",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "RELEASE ISSUES — ${CURRENT_RELEASE}",
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "jira-metrics-postgres"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "left",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": true,
+            "inspect": true
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "SUMMARY"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 772
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "POINTS"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 95
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "STARTED"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 185
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "RESOLVED"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 211
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "ISSUE"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 114
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "TYPE"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 129
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "STATUS"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 158
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "PRIORITY"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 153
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "DEV"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 135
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 24,
+        "x": 0,
+        "y": 48
+      },
+      "id": 12,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "enablePagination": false,
+          "fields": [
+            "POINTS"
+          ],
+          "reducer": [
+            "sum"
+          ],
+          "show": true
+        },
+        "showHeader": true,
+        "sortBy": []
+      },
+      "pluginVersion": "12.0.8",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "jira-metrics-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "SELECT  \r\n    issue_key AS \"ISSUE\",\r\n    story_points AS \"POINTS\",\r\n    summary AS \"SUMMARY\", \r\n    status AS \"STATUS\",\r\n    COALESCE(priority_id || ' - ' || priority_name, 'UNASSIGNED') as \"PRIORITY\",\r\n    COALESCE(split_part(split_part(assignee, ' ', 1), '.',1), 'UNASSIGNED') AS \"DEV\",\r\n\t\tTO_CHAR(started, 'DD/MM/YYYY HH24:MI') AS \"STARTED\", \r\n    TO_CHAR(resolved, 'DD/MM/YYYY HH24:MI') AS \"RESOLVED\"\r\nFROM public.jira_issues \r\nWHERE release LIKE '%$CURRENT_RELEASE%'\r\n  AND issue_type = 'Epic'\r\nORDER BY COALESCE(priority_id || ' - ' || priority_name, 'UNASSIGNED')",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "EPICS — ${CURRENT_RELEASE}",
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 59
+      },
+      "id": 6,
+      "panels": [],
+      "title": "AVERAGES",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "jira-metrics-postgres"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "fieldMinMax": true,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "AVG BUG POINTS"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "AVG STORY POINTS"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "RELEASE TOTAL POINTS"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 18,
+        "x": 0,
+        "y": 60
+      },
+      "id": 14,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "vertical",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.0.8",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "jira-metrics-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH base AS (\r\n    SELECT  \r\n      sprint_name,\r\n      issue_type, \r\n      status, \r\n      story_points,\r\n      release,\r\n      resolved,\r\n      COALESCE(split_part(split_part(assignee, ' ', 1), '.',1), 'UNASSIGNED') as assignee\r\n   FROM jira_issues \r\n  WHERE story_points > 0\r\n    AND COALESCE(assignee, 'UNASSIGNED') IN ($SELECTED_DEVS)\r\n ),\r\naverage_by_sprint AS (\r\n    SELECT\r\n        sprint_name,\r\n        SUM(CASE WHEN issue_type ILIKE '%Bug%' THEN story_points ELSE 0 END) AS points_of_bug,\r\n        SUM(CASE WHEN issue_type ILIKE '%Bug%' THEN 0 ELSE story_points END) AS points_of_history\r\n    FROM base\r\n   WHERE sprint_name IN ($ALL_SPRINTS)\r\n    AND resolved IS NOT NULL\r\n   GROUP BY sprint_name\r\n),\r\naverage AS (\r\n    SELECT\r\n        FLOOR(AVG(points_of_bug)) AS average_bugs,\r\n        FLOOR(AVG(points_of_history)) AS average_history,\r\n        (SELECT SUM(story_points) FROM base WHERE release LIKE '%$CURRENT_RELEASE%' AND resolved IS NULL) AS release_pending_points,\r\n        (SELECT SUM(story_points) FROM base WHERE release LIKE '%$CURRENT_RELEASE%' AND resolved IS NULL AND status NOT IN ('TO DO')) AS release_in_process_points,\r\n        (SELECT SUM(story_points) FROM base WHERE release LIKE '%$CURRENT_RELEASE%' AND resolved IS NULL AND status IN ('TO DO')) AS release_to_do_points,\r\n        (SELECT SUM(story_points) FROM base WHERE release LIKE '%$CURRENT_RELEASE%') AS release_points\r\n  FROM average_by_sprint\r\n)\r\nSELECT\r\n  average_bugs AS \"AVG BUG POINTS\",\r\n  average_history AS \"AVG STORY POINTS\",\r\n  release_points AS \"RELEASE TOTAL POINTS\",\r\n  (average_history * $NUMBER_OF_SPRINTS) AS \"TEAM CAPACITY (POINTS)\",\r\n  release_to_do_points AS \"POINTS IN TO DO\",\r\n  release_in_process_points AS \"POINTS IN PROGRESS\",\r\n  release_pending_points AS \"REMAINING RELEASE POINTS\",\r\n  CASE WHEN release_pending_points / NULLIF(average_history, 0) >= 1 \r\n       THEN ROUND(release_pending_points / NULLIF(average_history, 0), 0) \r\n       ELSE FLOOR(release_pending_points / NULLIF(average_history, 0)) \r\n       END AS \"SPRINTS TO FINISH REMAINING\",\r\n       ROUND(release_points / NULLIF(average_history, 0), 1) AS \"SPRINTS TO FINISH RELEASE\"\r\nFROM average;",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "RELEASE FORECAST (HISTORICAL BASELINE)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "grafana-postgresql-datasource",
+        "uid": "jira-metrics-postgres"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "center",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "decimals": 0,
+          "fieldMinMax": false,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 14,
+        "x": 0,
+        "y": 67
+      },
+      "id": 7,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": [
+            "BUGS",
+            "RELEASE",
+            "TOTAL"
+          ],
+          "reducer": [
+            "mean"
+          ],
+          "show": true
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "12.0.8",
+      "targets": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "jira-metrics-postgres"
+          },
+          "editorMode": "code",
+          "format": "table",
+          "rawQuery": true,
+          "rawSql": "WITH base AS (\r\n    SELECT\r\n        sprint_name,\r\n        COALESCE(split_part(split_part(assignee, ' ', 1), '.', 1), 'UNASSIGNED') AS dev,\r\n        issue_type,\r\n        story_points\r\n    FROM public.jira_issues\r\n    WHERE resolved IS NOT NULL\r\n      AND story_points > 0\r\n      AND sprint_name IN ($ALL_SPRINTS)\r\n      AND COALESCE(assignee, 'UNASSIGNED') IN ($SELECTED_DEVS)\r\n),\r\nby_dev AS (\r\n    SELECT\r\n        sprint_name,\r\n        dev,\r\n        SUM(CASE WHEN issue_type ILIKE '%Bug%' THEN story_points ELSE 0 END) AS bug_points,\r\n        SUM(CASE WHEN issue_type ILIKE '%Bug%' THEN 0 ELSE story_points END) AS story_points_done,\r\n        FLOOR(100.0 * SUM(CASE WHEN issue_type ILIKE '%Bug%' THEN story_points ELSE 0 END) / NULLIF(SUM(story_points), 0)) AS bug_pct\r\n    FROM base\r\n    GROUP BY sprint_name, dev\r\n),\r\nby_sprint AS (\r\n    SELECT\r\n        sprint_name,\r\n        SUM(bug_points) AS total_bugs,\r\n        SUM(story_points_done) AS total_releases,\r\n        FLOOR(100.0 * SUM(bug_points) / NULLIF(SUM(bug_points + story_points_done), 0)) AS bug_pct_sprint\r\n    FROM by_dev\r\n    GROUP BY sprint_name\r\n)\r\n\r\nSELECT \r\n    d.sprint_name AS \"SPRINT\",\r\n    s.total_bugs AS \"BUGS\",\r\n    s.total_releases AS \"RELEASE\",\r\n    s.total_bugs + s.total_releases AS \"TOTAL\"\r\nFROM by_dev d\r\nJOIN by_sprint s ON d.sprint_name = s.sprint_name\r\nGROUP by d.sprint_name, s.total_bugs, s.total_releases, s.bug_pct_sprint\r\nORDER BY d.sprint_name;\r\n",
+          "refId": "A",
+          "sql": {
+            "columns": [
+              {
+                "parameters": [],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50
+          }
+        }
+      ],
+      "title": "BUG VS STORY POINTS PER SPRINT",
+      "type": "table"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 77
+      },
+      "id": 11,
+      "panels": [
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "jira-metrics-postgres"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "continuous-GrYlRd"
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 10,
+            "x": 0,
+            "y": 87
+          },
+          "id": 9,
+          "options": {
+            "displayMode": "lcd",
+            "legend": {
+              "calcs": [],
+              "displayMode": "list",
+              "placement": "bottom",
+              "showLegend": false
+            },
+            "maxVizHeight": 300,
+            "minVizHeight": 16,
+            "minVizWidth": 8,
+            "namePlacement": "auto",
+            "orientation": "horizontal",
+            "reduceOptions": {
+              "calcs": [],
+              "fields": "",
+              "values": true
+            },
+            "showUnfilled": true,
+            "sizing": "auto",
+            "valueMode": "color"
+          },
+          "pluginVersion": "12.0.5",
+          "targets": [
+            {
+              "datasource": {
+                "type": "grafana-postgresql-datasource",
+                "uid": "jira-metrics-postgres"
+              },
+              "editorMode": "code",
+              "format": "table",
+              "rawQuery": true,
+              "rawSql": "\r\nWITH base AS (\r\nSELECT\r\n\tsprint_name,\r\n\tCOALESCE(split_part(split_part(assignee, ' ', 1), '.', 1), 'UNASSIGNED') AS dev,\r\n\tissue_type,\r\n\tstory_points\r\nFROM public.jira_issues\r\nWHERE resolved IS NOT NULL\r\n AND story_points > 0\r\n AND sprint_name IN ($ALL_SPRINTS)\r\n AND resolved IS NOT NULL\r\n AND COALESCE(assignee, 'UNASSIGNED') IN ($SELECTED_DEVS)\r\n),\r\npoints_per_sprint AS (\r\n    SELECT\r\n        dev,\r\n        sprint_name,\r\n        SUM(story_points) AS sprint_points\r\n    FROM base\r\n    GROUP BY dev, sprint_name\r\n),\r\navg_per_dev AS (\r\n    SELECT\r\n        dev,\r\n        FLOOR(AVG(sprint_points)) AS avg_points\r\n    FROM points_per_sprint\r\n    GROUP BY dev\r\n)\r\n(\r\n    SELECT\r\n        dev,\r\n        FLOOR(AVG(sprint_points)) AS avg_points\r\n    FROM points_per_sprint\r\n    GROUP BY dev\r\n    ORDER By dev\r\n)\r\nUNION ALL\r\n(\r\n    SELECT  \r\n    'OVERALL AVERAGE' AS dev,\r\n    SUM(avg_points) AS avg_points\r\nFROM avg_per_dev\r\n)",
+              "refId": "A",
+              "sql": {
+                "columns": [
+                  {
+                    "parameters": [],
+                    "type": "function"
+                  }
+                ],
+                "groupBy": [
+                  {
+                    "property": {
+                      "type": "string"
+                    },
+                    "type": "groupBy"
+                  }
+                ],
+                "limit": 50
+              }
+            }
+          ],
+          "title": "AVERAGE POINTS PER DEVELOPER",
+          "type": "bargauge"
+        },
+        {
+          "datasource": {
+            "type": "grafana-postgresql-datasource",
+            "uid": "jira-metrics-postgres"
+          },
+          "fieldConfig": {
+            "defaults": {
+              "custom": {
+                "align": "center",
+                "cellOptions": {
+                  "type": "auto"
+                },
+                "inspect": false
+              },
+              "mappings": [],
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green"
+                  },
+                  {
+                    "color": "red",
+                    "value": 80
+                  }
+                ]
+              }
+            },
+            "overrides": [
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "26.01 - SP01"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "26.01 - SP02"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width"
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "26.01 - SP03"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 218
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "26.02 - SP01"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 202
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "26.02 - SP02"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width",
+                    "value": 220
+                  }
+                ]
+              },
+              {
+                "matcher": {
+                  "id": "byName",
+                  "options": "26.02 - SP03"
+                },
+                "properties": [
+                  {
+                    "id": "custom.width"
+                  }
+                ]
+              }
+            ]
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 14,
+            "x": 10,
+            "y": 87
+          },
+          "id": 4,
+          "options": {
+            "cellHeight": "sm",
+            "footer": {
+              "countRows": false,
+              "fields": [],
+              "reducer": [
+                "sum"
+              ],
+              "show": true
+            },
+            "frameIndex": 1,
+            "showHeader": true,
+            "sortBy": []
+          },
+          "pluginVersion": "12.0.5",
+          "targets": [
+            {
+              "datasource": {
+                "type": "grafana-postgresql-datasource",
+                "uid": "jira-metrics-postgres"
+              },
+              "editorMode": "code",
+              "format": "table",
+              "rawQuery": true,
+              "rawSql": "\r\nWITH base AS (\r\nSELECT\r\n\tsprint_name,\r\n\tCOALESCE(split_part(split_part(assignee, ' ', 1), '.', 1), 'UNASSIGNED') AS dev,\r\n\tissue_type,\r\n\tstory_points\r\nFROM public.jira_issues\r\nWHERE resolved IS NOT NULL\r\n AND story_points > 0\r\n AND sprint_name IN ($ALL_SPRINTS)\r\n AND assignee IN ($SELECTED_DEVS)\r\n)\r\nSELECT\r\n    REPLACE(sprint_name, '$SPRINT_PREFIX - ', '') AS sprint_name,\r\n    dev,\r\n    SUM(story_points) AS points,                                -- points for this dev in this sprint\r\n    ROUND(AVG(SUM(story_points)) OVER (PARTITION BY dev), 2) AS avg_per_dev, -- dev's average across all sprints\r\n    SUM(SUM(story_points)) OVER (PARTITION BY sprint_name) AS sprint_total, -- total points in this sprint\r\n    SUM(CASE WHEN issue_type ILIKE '%Bug%' THEN story_points ELSE 0 END) AS bug_points, -- bug points\r\n    SUM(CASE WHEN issue_type ILIKE '%Bug%' THEN 0 ELSE story_points END) AS story_points_done, -- non-bug (story) points\r\n    ROUND(\r\n        100.0 * SUM(CASE WHEN issue_type ILIKE '%Bug%' THEN story_points ELSE 0 END)\r\n        / NULLIF(SUM(story_points), 0),\r\n        1\r\n    ) AS bug_pct -- % of this dev's sprint points that were bugs\r\nFROM base\r\nGROUP BY sprint_name, dev\r\nORDER BY sprint_name, dev;",
+              "refId": "A",
+              "sql": {
+                "columns": [
+                  {
+                    "parameters": [],
+                    "type": "function"
+                  }
+                ],
+                "groupBy": [
+                  {
+                    "property": {
+                      "type": "string"
+                    },
+                    "type": "groupBy"
+                  }
+                ],
+                "limit": 50
+              }
+            }
+          ],
+          "title": "PER-SPRINT BREAKDOWN BY DEVELOPER",
+          "transformations": [
+            {
+              "id": "groupingToMatrix",
+              "options": {
+                "columnField": "sprint_name",
+                "emptyValue": "null",
+                "rowField": "dev",
+                "valueField": "points"
+              }
+            },
+            {
+              "id": "calculateField",
+              "options": {
+                "mode": "reduceRow",
+                "reduce": {
+                  "include": [],
+                  "reducer": "sum"
+                },
+                "replaceFields": false
+              }
+            }
+          ],
+          "type": "table"
+        }
+      ],
+      "title": "INDIVIDUAL AVERAGES",
+      "type": "row"
+    }
+  ],
+  "preload": false,
+  "refresh": "15m",
+  "schemaVersion": 41,
+  "tags": [],
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "text": "Demo Board",
+          "value": "Demo Board"
+        },
+        "label": "SPRINT NAME PREFIX",
+        "name": "SPRINT_PREFIX",
+        "options": [
+          {
+            "text": "Demo Board",
+            "value": "Demo Board",
+            "selected": true
+          }
+        ],
+        "query": "Demo Board",
+        "type": "textbox"
+      },
+      {
+        "current": {
+          "text": "$__all",
+          "value": "$__all"
+        },
+        "definition": "SELECT DISTINCT assignee\nFROM jira_issues\nWHERE sprint_name LIKE '$SPRINT_PREFIX%'\n  AND assignee IS NOT NULL\n\nUNION ALL\nSELECT 'UNASSIGNED'\nORDER BY assignee;",
+        "label": "DEVELOPERS",
+        "multi": true,
+        "name": "SELECTED_DEVS",
+        "options": [],
+        "query": "SELECT DISTINCT assignee\nFROM jira_issues\nWHERE sprint_name LIKE '$SPRINT_PREFIX%'\n  AND assignee IS NOT NULL\n\nUNION ALL\nSELECT 'UNASSIGNED'\nORDER BY assignee;",
+        "refresh": 1,
+        "regex": "",
+        "type": "query",
+        "includeAll": true
+      },
+      {
+        "current": {
+          "text": "Demo Release 26.02",
+          "value": "Demo Release 26.02"
+        },
+        "includeAll": false,
+        "label": "RELEASE",
+        "name": "CURRENT_RELEASE",
+        "options": [
+          {
+            "selected": true,
+            "text": "Demo Release 26.02",
+            "value": "Demo Release 26.02"
+          },
+          {
+            "selected": false,
+            "text": "Demo Release 26.01",
+            "value": "Demo Release 26.01"
+          }
+        ],
+        "query": "Demo Release 26.02, Demo Release 26.01",
+        "type": "custom"
+      },
+      {
+        "current": {
+          "text": [
+            "$__all"
+          ],
+          "value": [
+            "$__all"
+          ]
+        },
+        "datasource": {
+          "type": "grafana-postgresql-datasource",
+          "uid": "jira-metrics-postgres"
+        },
+        "definition": "SELECT DISTINCT sprint_name\n\tFROM jira_issues\n\tWHERE sprint_name LIKE '$SPRINT_PREFIX%'\n\tORDER BY sprint_name DESC;",
+        "description": "Past sprints included in the average calculations",
+        "includeAll": true,
+        "label": "SPRINTS USED FOR AVERAGES",
+        "multi": true,
+        "name": "ALL_SPRINTS",
+        "options": [],
+        "query": "SELECT DISTINCT sprint_name\n\tFROM jira_issues\n\tWHERE sprint_name LIKE '$SPRINT_PREFIX%'\n\tORDER BY sprint_name DESC;",
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "Demo Board - 26.02 - SP03",
+          "value": "Demo Board - 26.02 - SP03"
+        },
+        "datasource": {
+          "type": "grafana-postgresql-datasource",
+          "uid": "jira-metrics-postgres"
+        },
+        "definition": "SELECT DISTINCT sprint_name\n\tFROM jira_issues\n\tWHERE sprint_name LIKE '$SPRINT_PREFIX%'\n\tORDER BY sprint_name DESC;",
+        "includeAll": false,
+        "label": "CURRENT SPRINT",
+        "name": "CURRENT_SPRINT",
+        "options": [],
+        "query": "SELECT DISTINCT sprint_name\n\tFROM jira_issues\n\tWHERE sprint_name LIKE '$SPRINT_PREFIX%'\n\tORDER BY sprint_name DESC;",
+        "refresh": 1,
+        "regex": "",
+        "type": "query"
+      },
+      {
+        "current": {
+          "text": "6",
+          "value": "6"
+        },
+        "includeAll": false,
+        "name": "NUMBER_OF_SPRINTS",
+        "options": [
+          {
+            "selected": true,
+            "text": "6",
+            "value": "6"
+          },
+          {
+            "selected": false,
+            "text": "7",
+            "value": "7"
+          }
+        ],
+        "query": "5, 6, 7",
+        "type": "custom"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-1y",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Jira Delivery Metrics",
+  "uid": "jira-delivery-metrics",
+  "version": 5
+}
